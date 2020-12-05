@@ -18,12 +18,15 @@ menu "Board extended module"
         if ART_PI_USING_MEDIA_IO
             config BSP_USING_SPI_LCD_ILI9488
                 bool
+            config PKG_USING_PERSIMMON_SRC
+                bool
 
             config MEDIA_IO_USING_SCREEN
                 select BSP_USING_SPI
                 select BSP_USING_SPI2
                 select BSP_USING_SDRAM
                 select BSP_USING_SPI_LCD_ILI9488
+                select PKG_USING_PERSIMMON_SRC
                 bool "Enable Screen"
                 default y
             config MEDIA_IO_USING_TOUCH
@@ -55,9 +58,6 @@ menu "Board extended module"
         bool "Industry-IO"
         default n
         if ART_PI_USING_INDUSTRY_IO
-            config PHY_USING_LAN8720A
-                bool
-
             config INDUSTRY_IO_USING_ETH
                 select BSP_USING_ETH
                 select PHY_USING_LAN8720A
@@ -91,12 +91,20 @@ menu "Onboard Peripheral"
         select BSP_USING_UART4
         default n
 
+    config BSP_USING_SPI_FLASH
+        bool "Enable SPI FLASH (spi1)"
+        select BSP_USING_SPI
+        select BSP_USING_SPI1
+        select PKG_USING_FAL
+        select FAL_USING_SFUD_PORT
+        select RT_USING_SFUD
+        default n
+        
     config BSP_USING_WIFI
         bool "Enable wifi (AP6212)"
         select ART_PI_USING_WIFI_6212_LIB
         select ART_PI_USING_OTA_LIB
-        select BSP_USING_SPI
-        select BSP_USING_SPI1
+        select BSP_USING_SPI_FLASH
         select RT_USING_WIFI
         select RT_USING_SAL
         default n
@@ -122,11 +130,9 @@ menu "Onboard Peripheral"
                 default n
             config BSP_USING_SPI_FLASH_FS
                 bool "Enable SPI FLASH filesystem"
-                select BSP_USING_SPI
-                select BSP_USING_SPI1
-                select PKG_USING_FAL
-                select FAL_USING_SFUD_PORT
-                select RT_USING_SFUD
+                select BSP_USING_SPI_FLASH
+                select RT_USING_MTD_NOR
+                select PKG_USING_LITTLEFS
                 default n
         endif
 
@@ -190,11 +196,11 @@ menu "On-chip Peripheral"
                     comment "Notice: PB6 --> 22; PB7 --> 23" 
                     config BSP_I2C1_SCL_PIN
                         int "I2C1 scl pin number"
-                        range 1 176
+                        range 0 175
                         default 22
                     config BSP_I2C1_SDA_PIN
                         int "I2C1 sda pin number"
-                        range 1 176
+                        range 0 175
                         default 23
                 endif
             menuconfig BSP_USING_I2C2
@@ -208,7 +214,7 @@ menu "On-chip Peripheral"
                         default 127
                     config BSP_I2C2_SDA_PIN
                         int "I2C2 sda pin number"
-                        range 1 176
+                        range 0 175
                         default 125
                 endif
             menuconfig BSP_USING_I2C3
@@ -218,11 +224,11 @@ menu "On-chip Peripheral"
                     comment "Notice: PH12 --> 124; PH11 --> 123"
                     config BSP_I2C3_SCL_PIN
                         int "i2c3 scl pin number"
-                        range 1 176
+                        range 0 175
                         default 123
                     config BSP_I2C3_SDA_PIN
                         int "I2C3 sda pin number"
-                        range 1 176
+                        range 0 175
                         default 124
                 endif
         endif
@@ -246,8 +252,22 @@ menu "On-chip Peripheral"
 
     menuconfig BSP_USING_ETH
         bool "Enable Ethernet"
+        default n        
         select RT_USING_LWIP
-        default n
+        if BSP_USING_ETH
+            config ETH_RESET_PIN
+                string "ETH RESET PIN"
+                default "PA.3"
+        endif
+        if BSP_USING_ETH
+            choice
+                prompt "Choose ETH PHY"
+                default PHY_USING_LAN8720A
+                        config PHY_USING_LAN8720A
+                    bool "USING LAN8720A"
+                    default n
+            endchoice
+        endif
 
     config BSP_USING_LCD
         bool "Enable LCD"
@@ -282,11 +302,13 @@ menu "On-chip Peripheral"
         if BSP_USING_USBH
             menuconfig RT_USBH_MSTORAGE
                 bool "Enable Udisk Drivers"
+                select RT_USING_DFS
+                select RT_USING_DFS_ELMFAT
                 default n
                 if RT_USBH_MSTORAGE
                     config UDISK_MOUNTPOINT
-                    string "Udisk mount dir"
-                    default "/"
+                        string "Udisk mount dir"
+                        default "/"
                 endif
         endif
         
@@ -330,6 +352,13 @@ menu "External Libraries"
         bool "Using TouchGFX Library"
         select BSP_USING_LCD
         select RT_USING_CPLUSPLUS
+        default n
+    
+    config ART_PI_USING_FTP_LIB
+        bool "Using FTP Library"
+        select RT_USING_SAL
+        select SAL_USING_POSIX
+        select RT_USING_DFS
         default n
 
 endmenu

@@ -313,6 +313,10 @@
 #define LFS_CACHE_SIZE 256
 #define LFS_BLOCK_CYCLES 1000
 #define LFS_LOOKAHEAD_MAX 128
+
+/* Micrium: Micrium software products porting for RT-Thread */
+
+/* end of Micrium: Micrium software products porting for RT-Thread */
 /* end of system packages */
 
 /* peripheral libraries and drivers */
@@ -334,6 +338,10 @@
 /* samples: kernel and components samples */
 
 /* end of samples: kernel and components samples */
+
+/* games: games run on RT-Thread console. */
+
+/* end of games: games run on RT-Thread console. */
 /* end of miscellaneous packages */
 /* end of RT-Thread online packages */
 
@@ -345,7 +353,6 @@
 /* Board extended module */
 
 #define ART_PI_USING_INDUSTRY_IO
-#define PHY_USING_LAN8720A
 #define INDUSTRY_IO_USING_ETH
 /* end of Board extended module */
 
@@ -365,6 +372,11 @@
 #define BSP_USING_SDIO
 #define BSP_USING_SDIO1
 #define BSP_USING_ETH
+
+/* Notice: PA3 --> 3 */
+
+#define ETH_RESET_PIN 3
+#define PHY_USING_LAN8720A
 /* end of On-chip Peripheral */
 /* end of Hardware Drivers Config */
 
